@@ -1,0 +1,127 @@
+package com.vobi.devops.bank.exception;
+
+/**
+ * @author Zathura Code Generator Version 9.0 http://zathuracode.org/
+ *         www.zathuracode.org
+ *
+ */
+public class ZMessManager extends RuntimeException {
+	private static final long serialVersionUID = 1L;
+	
+	public final static String ALL = "All ";
+	public final static String ENTCHILD = "related tables(childs)";
+	public final static String FOREIGNDATA = "foreign classes data: ";
+	public static String ENTITY_SUCCESFULLYSAVED = "Entity succesfully saved";
+	public static String ENTITY_SUCCESFULLYDELETED = "Entity succesfully deleted";
+	public static String ENTITY_SUCCESFULLYMODIFIED = "Entity succesfully modified";
+	public static String ENTITY_WITHSAMEKEY = "Another Entity with the same key was found";
+	public static String ENTITY_NOENTITYTOUPDATE = "No Entity was found, with the typed key ";
+
+	public ZMessManager() {
+	}
+
+	public ZMessManager(String exception) {
+		super(exception);
+	}
+
+	public class NotValidFieldException extends ZMessManager {
+		private static final long serialVersionUID = 1L;
+
+		public NotValidFieldException(String info) {
+			super("The value for the field: \"" + info + "\" is not valid");
+		}
+	}
+
+	public class NullEntityExcepcion extends ZMessManager {
+		private static final long serialVersionUID = 1L;
+
+		public NullEntityExcepcion(String info) {
+			super("The " + info + " Entity can not be null or empty");
+		}
+	}
+
+	public class EmptyFieldException extends ZMessManager {
+		private static final long serialVersionUID = 1L;
+
+		public EmptyFieldException(String info) {
+			super("The value for the field: \"" + info + "\" can not be null or empty");
+		}
+	}
+
+	public class NotValidFormatException extends ZMessManager {
+		private static final long serialVersionUID = 1L;
+
+		public NotValidFormatException(String info) {
+			super("The Format or length for the field: \"" + info + "\" is not valid");
+		}
+	}
+
+	public class DeletingException extends ZMessManager {
+		private static final long serialVersionUID = 1L;
+
+		public DeletingException(String info) {
+			super("The Entity you are trying to delete " + "may have related information, "
+					+ "please before trying again, " + "check the data on the entity, \"" + info + "\"");
+		}
+	}
+
+	public class ForeignException extends ZMessManager {
+		private static final long serialVersionUID = 1L;
+
+		public ForeignException(String info) {
+			super("There was no data related with the input \"" + info + "\"");
+		}
+	}
+
+	public class GettingException extends ZMessManager {
+		private static final long serialVersionUID = 1L;
+
+		public GettingException(String info) {
+			super("There was an exception getting " + info);
+		}
+	}
+
+	public class FindingException extends ZMessManager {
+		private static final long serialVersionUID = 1L;
+
+		public FindingException(String info) {
+			super("There was an exception trying to find " + info);
+		}
+	}
+
+	public class AccountNotFoundException extends ZMessManager {
+		private static final long serialVersionUID = 1L;
+
+		public AccountNotFoundException(String accountId) {
+			super("The account with id " + accountId + " was not found");
+		}
+	}
+
+	public class AccountNotEnableException extends ZMessManager {
+		private static final long serialVersionUID = 1L;
+
+		public AccountNotEnableException(String accountId) {
+			super("La cuenta con id " + accountId + " no esta activa");
+		}
+
+	}
+
+	public class UserNotFoundException extends ZMessManager {
+		private static final long serialVersionUID = 1L;
+
+		public UserNotFoundException(String userEmail) {
+			super("La user con Email " + userEmail + " no esta existe");
+		}
+
+	}
+
+	public class UserDisableException extends ZMessManager {
+		private static final long serialVersionUID = 1L;
+
+		public UserDisableException(String userEmail) {
+			super("El user con Email " + userEmail + " no esta activo");
+		}
+
+	}
+
+}
