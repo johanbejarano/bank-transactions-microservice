@@ -5,17 +5,14 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import com.vobi.devops.bank.domain.Transaction;
 import com.vobi.devops.bank.domain.TransactionType;
 import com.vobi.devops.bank.dto.AccountDTO;
 import com.vobi.devops.bank.dto.DepositDTO;
-import com.vobi.devops.bank.dto.LoginResponse;
 import com.vobi.devops.bank.dto.TransactionResultDTO;
 import com.vobi.devops.bank.dto.TransferDTO;
 import com.vobi.devops.bank.dto.UsersDTO;
@@ -23,8 +20,8 @@ import com.vobi.devops.bank.dto.WithdrawDTO;
 import com.vobi.devops.bank.entityservice.TransactionService;
 import com.vobi.devops.bank.entityservice.TransactionTypeService;
 import com.vobi.devops.bank.exception.ZMessManager;
-
-import reactor.core.publisher.Mono;
+import com.vobi.devops.bank.openfeignclients.AccountServiceClient;
+import com.vobi.devops.bank.openfeignclients.UsersServiceClient;
 
 @Service
 @Scope("singleton")
@@ -39,13 +36,10 @@ public class BankTransactionServiceImpl implements BankTransactionService {
 	TransactionService transactionService;
 	
 	@Autowired
-	WebClient accountsWebClient;
+	AccountServiceClient accountServiceClient;
 	
 	@Autowired
-	WebClient loginWebClient;
-	
-	@Autowired
-	WebClient usersWebClient;
+	UsersServiceClient usersServiceClient;
 
 	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -130,68 +124,75 @@ public class BankTransactionServiceImpl implements BankTransactionService {
 	
 	private AccountDTO getAccount(String accoId) throws Exception {
 		
-		//TODO: Ahora se quema. Se debe configurar
-		String bodyString = "{"
-				+ "    \"username\": \"admin\","
-				+ "    \"password\": \"password\""
-				+ "}";
+		//Using OpenFeign
+		return accountServiceClient.findById(accoId);
 		
-		//Se autentica para obtener un token
-		Mono<LoginResponse> respuestaLogin = loginWebClient.post()
-				.bodyValue(bodyString)
-				.retrieve()
-				.bodyToMono(LoginResponse.class);
-		
-		LoginResponse loginResponse = respuestaLogin.block();
-		
-		if (loginResponse == null ) {
-			throw new Exception("No se pudo autenticar con la API");
-		}
-		
-		String token = loginResponse.getToken();
-		
-		
-		//Se invoca la API para consultar la cuenta
-		Mono<AccountDTO> respuestaConsultaCuenta = accountsWebClient.get()
-			.uri("/" + accoId)
-			.header(HttpHeaders.AUTHORIZATION, token)
-			.retrieve()
-			.bodyToMono(AccountDTO.class);
-		
-		return respuestaConsultaCuenta.block();
+//		//TODO: Ahora se quema. Se debe configurar
+//		String bodyString = "{"
+//				+ "    \"username\": \"admin\","
+//				+ "    \"password\": \"password\""
+//				+ "}";
+//		
+//		//Se autentica para obtener un token
+//		Mono<LoginResponse> respuestaLogin = loginWebClient.post()
+//				.bodyValue(bodyString)
+//				.retrieve()
+//				.bodyToMono(LoginResponse.class);
+//		
+//		LoginResponse loginResponse = respuestaLogin.block();
+//		
+//		if (loginResponse == null ) {
+//			throw new Exception("No se pudo autenticar con la API");
+//		}
+//		
+//		String token = loginResponse.getToken();
+//		
+//		
+//		//Se invoca la API para consultar la cuenta
+//		Mono<AccountDTO> respuestaConsultaCuenta = accountsWebClient.get()
+//			.uri("/" + accoId)
+//			.header(HttpHeaders.AUTHORIZATION, token)
+//			.retrieve()
+//			.bodyToMono(AccountDTO.class);
+//		
+//		return respuestaConsultaCuenta.block();
 		
 	}
 	
 	private UsersDTO getUser(String userEmail) throws Exception {
-		//TODO: Ahora se quema. Se debe configurar
-		String bodyString = "{"
-				+ "    \"username\": \"admin\","
-				+ "    \"password\": \"password\""
-				+ "}";
 		
-		//Se autentica para obtener un token
-		Mono<LoginResponse> respuestaLogin = loginWebClient.post()
-				.bodyValue(bodyString)
-				.retrieve()
-				.bodyToMono(LoginResponse.class);
+		//Using OpenFeign
+		return usersServiceClient.getUser(userEmail);
 		
-		LoginResponse loginResponse = respuestaLogin.block();
-		
-		if (loginResponse == null ) {
-			throw new Exception("No se pudo autenticar con la API");
-		}
-		
-		String token = loginResponse.getToken();
-		
-		
-		//Se invoca la API para consultar el usuario
-		Mono<UsersDTO> respuestaConsultaUsuario = usersWebClient.get()
-			.uri("/" + userEmail)
-			.header(HttpHeaders.AUTHORIZATION, token)
-			.retrieve()
-			.bodyToMono(UsersDTO.class);
-		
-		return respuestaConsultaUsuario.block();
+//		//TODO: Ahora se quema. Se debe configurar
+//		String bodyString = "{"
+//				+ "    \"username\": \"admin\","
+//				+ "    \"password\": \"password\""
+//				+ "}";
+//		
+//		//Se autentica para obtener un token
+//		Mono<LoginResponse> respuestaLogin = loginWebClient.post()
+//				.bodyValue(bodyString)
+//				.retrieve()
+//				.bodyToMono(LoginResponse.class);
+//		
+//		LoginResponse loginResponse = respuestaLogin.block();
+//		
+//		if (loginResponse == null ) {
+//			throw new Exception("No se pudo autenticar con la API");
+//		}
+//		
+//		String token = loginResponse.getToken();
+//		
+//		
+//		//Se invoca la API para consultar el usuario
+//		Mono<UsersDTO> respuestaConsultaUsuario = usersWebClient.get()
+//			.uri("/" + userEmail)
+//			.header(HttpHeaders.AUTHORIZATION, token)
+//			.retrieve()
+//			.bodyToMono(UsersDTO.class);
+//		
+//		return respuestaConsultaUsuario.block();
 	}
 
 	@Override
