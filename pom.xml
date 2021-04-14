@@ -38,6 +38,7 @@
         <skip.unit.tests>false</skip.unit.tests>
         <skip.jacoco>false</skip.jacoco>
         <surefire.and.failsafe.report.dir>target/test-report</surefire.and.failsafe.report.dir>
+        <spring.cloud.version>3.0.2</spring.cloud.version>
 	</properties>
 	
 	<profiles>
@@ -188,10 +189,19 @@
 			<scope>test</scope>
 		</dependency>	
 		
-		<!-- WebFlux -->
+		<!-- WebFlux (No se necesita mas)-->
+		<!-- 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+		 -->
+		 
+		<!-- OpenFeign -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+			<version>${spring.cloud.version}</version>
 		</dependency>
 
 	</dependencies>
