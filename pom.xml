@@ -211,6 +211,13 @@
 			<version>${spring.cloud.version}</version>
 		</dependency>
 		
+		<!-- Client-side load balancer -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-loadbalancer</artifactId>
+			<version>${spring.cloud.version}</version>
+		</dependency>
+		
 
 	</dependencies>
 
