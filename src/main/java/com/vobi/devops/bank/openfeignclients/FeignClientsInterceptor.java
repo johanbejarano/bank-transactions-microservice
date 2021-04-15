@@ -10,13 +10,12 @@ import com.vobi.devops.bank.dto.LoginResponse;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
-import feign.Target;
 
 @Component
 public class FeignClientsInterceptor implements RequestInterceptor {
 
 	@Autowired
-	LoginServiceClient loginServiceClient;
+	UsersServiceClient usersServiceClient;
 	
 	@Value("${login.service.username}")
 	String username;
@@ -28,8 +27,7 @@ public class FeignClientsInterceptor implements RequestInterceptor {
 	public void apply(RequestTemplate template) {
 		
 		//Se autentica el servicio, para todas las invocaciones EXCEPTO la del mismo /login
-		Target target = template.feignTarget();
-		String url = target.url();
+		String url = template.url();
 		
 		if (url.indexOf("/login") >= 0) {
 			return;
@@ -41,7 +39,7 @@ public class FeignClientsInterceptor implements RequestInterceptor {
 		//Se consume el cliente de login
 		
 		LoginRequest loginRequest = new LoginRequest(username, password);
-		LoginResponse loginResponse = loginServiceClient.login(loginRequest);
+		LoginResponse loginResponse = usersServiceClient.login(loginRequest);
 		
 		if (loginResponse == null) {
 			return;

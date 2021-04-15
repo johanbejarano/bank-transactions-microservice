@@ -7,8 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.vobi.devops.bank.dto.AccountDTO;
 
 @FeignClient(
-		url = "${accounts.service.url}",
-		value = "accounts-service-client"
+		value = "accounts-service"
 		)
 public interface AccountServiceClient {
 
@@ -18,7 +17,7 @@ public interface AccountServiceClient {
 	 * @param accoId
 	 * @return
 	 */
-	@GetMapping(value = "/{accoId}")
+	@GetMapping(value = "/api/v1/account/{accoId}")
 	public AccountDTO findById(
 			@PathVariable("accoId") String accoId
 			);
