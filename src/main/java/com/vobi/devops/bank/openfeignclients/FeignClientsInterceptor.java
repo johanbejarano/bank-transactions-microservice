@@ -15,7 +15,7 @@ import feign.RequestTemplate;
 public class FeignClientsInterceptor implements RequestInterceptor {
 
 	@Autowired
-	UsersServiceClient usersServiceClient;
+	FeignClients feignClient;
 	
 	@Value("${login.service.username}")
 	String username;
@@ -39,7 +39,7 @@ public class FeignClientsInterceptor implements RequestInterceptor {
 		//Se consume el cliente de login
 		
 		LoginRequest loginRequest = new LoginRequest(username, password);
-		LoginResponse loginResponse = usersServiceClient.login(loginRequest);
+		LoginResponse loginResponse = feignClient.login(loginRequest);
 		
 		if (loginResponse == null) {
 			return;
