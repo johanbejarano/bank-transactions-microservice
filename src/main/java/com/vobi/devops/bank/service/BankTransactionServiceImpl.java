@@ -20,8 +20,7 @@ import com.vobi.devops.bank.dto.WithdrawDTO;
 import com.vobi.devops.bank.entityservice.TransactionService;
 import com.vobi.devops.bank.entityservice.TransactionTypeService;
 import com.vobi.devops.bank.exception.ZMessManager;
-import com.vobi.devops.bank.openfeignclients.AccountServiceClient;
-import com.vobi.devops.bank.openfeignclients.UsersServiceClient;
+import com.vobi.devops.bank.openfeignclients.FeignClients;
 
 @Service
 @Scope("singleton")
@@ -36,11 +35,9 @@ public class BankTransactionServiceImpl implements BankTransactionService {
 	TransactionService transactionService;
 	
 	@Autowired
-	AccountServiceClient accountServiceClient;
+	FeignClients feignClients;
 	
-	@Autowired
-	UsersServiceClient usersServiceClient;
-
+	
 	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public TransactionResultDTO transfer(TransferDTO transferDTO) throws Exception {
@@ -125,7 +122,7 @@ public class BankTransactionServiceImpl implements BankTransactionService {
 	private AccountDTO getAccount(String accoId) throws Exception {
 		
 		//Using OpenFeign
-		return accountServiceClient.findById(accoId);
+		return feignClients.findAcccountById(accoId);
 		
 //		//TODO: Ahora se quema. Se debe configurar
 //		String bodyString = "{"
@@ -162,7 +159,7 @@ public class BankTransactionServiceImpl implements BankTransactionService {
 	private UsersDTO getUser(String userEmail) throws Exception {
 		
 		//Using OpenFeign
-		return usersServiceClient.getUser(userEmail);
+		return feignClients.getUser(userEmail);
 		
 //		//TODO: Ahora se quema. Se debe configurar
 //		String bodyString = "{"
