@@ -22,6 +22,8 @@ import com.vobi.devops.bank.entityservice.TransactionTypeService;
 import com.vobi.devops.bank.exception.ZMessManager;
 import com.vobi.devops.bank.openfeignclients.FeignClients;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 @Service
 @Scope("singleton")
 public class BankTransactionServiceImpl implements BankTransactionService {
@@ -35,7 +37,10 @@ public class BankTransactionServiceImpl implements BankTransactionService {
 	TransactionService transactionService;
 	
 	@Autowired
-	FeignClients feignClients;
+	AccountServiceCircuitBreaker accountServiceCircuitBreaker;
+	
+	@Autowired
+	UserServiceCiurcuitBreaker userServiceCiurcuitBreaker;
 	
 	
 	@Override
@@ -84,7 +89,7 @@ public class BankTransactionServiceImpl implements BankTransactionService {
 //		Account account = accountOptional.get();
 		
 		//Se consulta la cuenta en el microservicio de cuentas
-		AccountDTO accountDTO = getAccount(transferDTO.getAccoIdOrigin());
+		AccountDTO accountDTO = accountServiceCircuitBreaker.getAccount(transferDTO.getAccoIdOrigin());
 		if (accountDTO == null) {
 			throw (new ZMessManager()).new FindingException("cuenta con id " + transferDTO.getAccoIdOrigin());
 		}
@@ -97,7 +102,7 @@ public class BankTransactionServiceImpl implements BankTransactionService {
 //		Users user = userOptional.get();
 		
 		//Se consulta el usuario
-		UsersDTO usersDTO = getUser(transferDTO.getUserEmail());
+		UsersDTO usersDTO = userServiceCiurcuitBreaker.getUser(transferDTO.getUserEmail());
 		if (usersDTO == null) {
 			throw (new ZMessManager()).new FindingException("Usuario con id " + transferDTO.getUserEmail());
 		}
@@ -119,78 +124,6 @@ public class BankTransactionServiceImpl implements BankTransactionService {
 
 	}
 	
-	private AccountDTO getAccount(String accoId) throws Exception {
-		
-		//Using OpenFeign
-		return feignClients.findAcccountById(accoId);
-		
-//		//TODO: Ahora se quema. Se debe configurar
-//		String bodyString = "{"
-//				+ "    \"username\": \"admin\","
-//				+ "    \"password\": \"password\""
-//				+ "}";
-//		
-//		//Se autentica para obtener un token
-//		Mono<LoginResponse> respuestaLogin = loginWebClient.post()
-//				.bodyValue(bodyString)
-//				.retrieve()
-//				.bodyToMono(LoginResponse.class);
-//		
-//		LoginResponse loginResponse = respuestaLogin.block();
-//		
-//		if (loginResponse == null ) {
-//			throw new Exception("No se pudo autenticar con la API");
-//		}
-//		
-//		String token = loginResponse.getToken();
-//		
-//		
-//		//Se invoca la API para consultar la cuenta
-//		Mono<AccountDTO> respuestaConsultaCuenta = accountsWebClient.get()
-//			.uri("/" + accoId)
-//			.header(HttpHeaders.AUTHORIZATION, token)
-//			.retrieve()
-//			.bodyToMono(AccountDTO.class);
-//		
-//		return respuestaConsultaCuenta.block();
-		
-	}
-	
-	private UsersDTO getUser(String userEmail) throws Exception {
-		
-		//Using OpenFeign
-		return feignClients.getUser(userEmail);
-		
-//		//TODO: Ahora se quema. Se debe configurar
-//		String bodyString = "{"
-//				+ "    \"username\": \"admin\","
-//				+ "    \"password\": \"password\""
-//				+ "}";
-//		
-//		//Se autentica para obtener un token
-//		Mono<LoginResponse> respuestaLogin = loginWebClient.post()
-//				.bodyValue(bodyString)
-//				.retrieve()
-//				.bodyToMono(LoginResponse.class);
-//		
-//		LoginResponse loginResponse = respuestaLogin.block();
-//		
-//		if (loginResponse == null ) {
-//			throw new Exception("No se pudo autenticar con la API");
-//		}
-//		
-//		String token = loginResponse.getToken();
-//		
-//		
-//		//Se invoca la API para consultar el usuario
-//		Mono<UsersDTO> respuestaConsultaUsuario = usersWebClient.get()
-//			.uri("/" + userEmail)
-//			.header(HttpHeaders.AUTHORIZATION, token)
-//			.retrieve()
-//			.bodyToMono(UsersDTO.class);
-//		
-//		return respuestaConsultaUsuario.block();
-	}
 
 	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
